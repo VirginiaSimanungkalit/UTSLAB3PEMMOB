@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import '../widgets/score_circle.dart';
-import '../widgets/custom_button.dart';
-import 'review_screen.dart';
+import '../widgets/stat_card.dart';
+import '../providers/theme_provider.dart';
 import 'welcome_screen.dart';
+import 'review_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final String userName;
   final int correctAnswers;
   final int totalQuestions;
   final List<int?> userAnswers;
+  final ThemeProvider themeProvider;
 
   const ResultScreen({
     super.key,
@@ -16,181 +18,162 @@ class ResultScreen extends StatelessWidget {
     required this.correctAnswers,
     required this.totalQuestions,
     required this.userAnswers,
+    required this.themeProvider,
   });
+
+  // Fungsi untuk mendapatkan judul berdasarkan skor
+  String _getTitle() {
+    if (correctAnswers >= 6) {
+      return 'Kerja Bagus!';
+    } else {
+      return 'Tetap Semangat!';
+    }
+  }
+
+  // Fungsi untuk mendapatkan pesan berdasarkan skor
+  String _getMessage() {
+    if (correctAnswers >= 6) {
+      return 'Anda telah menyelesaikan kuis dengan hasil\nyang sangat baik. Teruslah belajar dan\ntingkatkan pengetahuan Anda!';
+    } else {
+      return 'Jangan berkecil hati! Setiap kesalahan adalah\nkesempatan untuk belajar. Coba lagi dan\ntingkatkan skormu!';
+    }
+  }
+
+  // Fungsi untuk mendapatkan emoji berdasarkan skor
+  String _getEmoji() {
+    if (correctAnswers >= 6) {
+      return '🎉';
+    } else {
+      return '💪';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final score = (correctAnswers / totalQuestions * 100).toInt();
     final wrongAnswers = totalQuestions - correctAnswers;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    // Responsive: Deteksi ukuran layar
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-    final horizontalPadding = isTablet ? screenWidth * 0.2 : 24.0;
+    final theme = Theme.of(context);
+    final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.primaryColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: theme.primaryColor,
+        elevation: 0,
         leading: IconButton(
           icon: Icon(
-            Icons.close,
-            color: Theme.of(context).textTheme.bodyLarge?.color,
+            Icons.close, 
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+              MaterialPageRoute(
+                builder: (context) => WelcomeScreen(
+                  themeProvider: themeProvider,
+                ),
+              ),
             );
           },
         ),
         title: Text(
           'Kuis Selesai!',
-          style: Theme.of(context).appBarTheme.titleTextStyle,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black87,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              
-              // Score Circle
-              ScoreCircle(score: score),
-              
-              const SizedBox(height: 32),
-              
-              // Title
-              Text(
-                'Kerja Bagus!',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  fontSize: isTablet ? 40 : 32,
+        child: SingleChildScrollView( // ← TAMBAHAN: Agar tidak overflow di layar kecil
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                ScoreCircle(score: score),
+                const SizedBox(height: 32),
+                
+                // Judul dinamis berdasarkan skor
+                Text(
+                  _getTitle(),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
                 ),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // Description
-              Text(
-                'Anda telah menyelesaikan kuis dengan hasil\nyang sangat baik. Teruslah belajar dan\ntingkatkan pengetahuan Anda!',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // Statistics Cards
-              Row(
-                children: [
-                  Expanded(
-                    child: _StatCard(
-                      icon: Icons.check,
-                      iconColor: Colors.green,
-                      label: 'Jawaban Benar',
-                      value: correctAnswers.toString(),
-                      isDark: isDark,
-                    ),
+                
+                const SizedBox(height: 12),
+                
+                // Pesan dinamis berdasarkan skor
+                Text(
+                  _getMessage(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDarkMode 
+                        ? Colors.white70 
+                        : Colors.black87.withOpacity(0.8),
+                    height: 1.5,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _StatCard(
-                      icon: Icons.close,
-                      iconColor: Colors.red,
-                      label: 'Jawaban Salah',
-                      value: wrongAnswers.toString(),
-                      isDark: isDark,
-                    ),
-                  ),
-                ],
-              ),
-              
-              const Spacer(),
-              
-              // Review Button
-              CustomButton(
-                text: 'Lihat Review Jawaban',
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReviewScreen(
-                        userAnswers: userAnswers,
+                ),
+                
+                const SizedBox(height: 32),
+                
+                Row(
+                  children: [
+                    Expanded(
+                      child: StatCard(
+                        icon: Icons.check,
+                        iconColor: Colors.green[300]!,
+                        label: 'Jawaban Benar',
+                        value: correctAnswers,
                       ),
                     ),
-                  );
-                },
-                backgroundColor: isDark
-                    ? Theme.of(context).primaryColor
-                    : Colors.black87,
-              ),
-            ],
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: StatCard(
+                        icon: Icons.close,
+                        iconColor: Colors.red[300]!,
+                        label: 'Jawaban Salah',
+                        value: wrongAnswers,
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 32),
+                
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReviewScreen(
+                            userAnswers: userAnswers,
+                            themeProvider: themeProvider,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDarkMode ? Colors.white : Colors.black87,
+                      foregroundColor: isDarkMode ? Colors.black87 : Colors.white,
+                    ),
+                    child: const Text('Lihat Review Jawaban'),
+                  ),
+                ),
+                
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final String value;
-  final bool isDark;
-
-  const _StatCard({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.value,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF1E1E1E)
-            : Theme.of(context).primaryColor.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 30,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.displayLarge?.color,
-            ),
-          ),
-        ],
       ),
     );
   }

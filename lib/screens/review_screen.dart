@@ -1,72 +1,72 @@
 import 'package:flutter/material.dart';
 import '../data/questions_data.dart';
 import '../widgets/review_card.dart';
-import '../widgets/custom_button.dart';
+import '../providers/theme_provider.dart';
 import 'welcome_screen.dart';
 
 class ReviewScreen extends StatelessWidget {
   final List<int?> userAnswers;
+  final ThemeProvider themeProvider;
 
-  const ReviewScreen({super.key, required this.userAnswers});
+  const ReviewScreen({
+    super.key, 
+    required this.userAnswers,
+    required this.themeProvider,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    // Responsive: Deteksi ukuran layar
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-    final horizontalPadding = isTablet ? screenWidth * 0.15 : 20.0;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: isDark 
-          ? const Color(0xFF121212) 
-          : const Color(0xFFF5E6D3),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: isDark 
-            ? const Color(0xFF121212) 
-            : const Color(0xFFF5E6D3),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
         title: Text(
           'Review Jawaban',
-          style: Theme.of(context).appBarTheme.titleTextStyle,
+          style: TextStyle(
+            color: theme.colorScheme.onBackground,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.all(horizontalPadding),
-              itemCount: questions.length,
-              itemBuilder: (context, index) {
-                final question = questions[index];
-                final userAnswer = userAnswers[index];
-                final isCorrect = userAnswer == question.correctAnswer;
+      body: ListView.builder(
+        padding: const EdgeInsets.all(20),
+        itemCount: questions.length,
+        itemBuilder: (context, index) {
+          final question = questions[index];
+          final userAnswer = userAnswers[index];
+          final isCorrect = userAnswer == question.correctAnswer;
 
-                return ReviewCard(
-                  question: question,
-                  questionNumber: index + 1,
-                  userAnswer: userAnswer,
-                  isCorrect: isCorrect,
-                );
-              },
-            ),
+          return ReviewCard(
+            question: question,
+            index: index,
+            isCorrect: isCorrect,
+          );
+        },
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => WelcomeScreen(
+                  themeProvider: themeProvider,
+                ),
+              ),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFB85C3F),
+            foregroundColor: Colors.white,
           ),
-          
-          // Back Button
-          Padding(
-            padding: EdgeInsets.all(horizontalPadding),
-            child: CustomButton(
-              text: 'Kembali ke Beranda',
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-                );
-              },
-              backgroundColor: const Color(0xFFB85C3F),
-            ),
-          ),
-        ],
+          child: const Text('Kembali ke Beranda'),
+        ),
       ),
     );
   }
