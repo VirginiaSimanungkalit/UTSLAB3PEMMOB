@@ -1,16 +1,29 @@
-# quiz_app
+## a. Nama, NIM, Lab
 
-A new Flutter project.
+Nama : Virginia Stevani Simanungkalit
 
-## Getting Started
+NIM : 231401062
 
-This project is a starting point for a Flutter application.
+Lab 3 Pemrograman Mobile
 
-A few resources to get you started if this is your first Flutter project:
+## b. Nama Aplikasi
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Kuisku
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## c. Deskripsi Aplikasi
+
+KuisKu adalah aplikasi kuis berbasis Flutter yang memungkinkan pengguna untuk memasukkan nama, menjawab serangkaian pertanyaan pilihan ganda, melihat skor akhir berdasarkan jawaban yang benar, dan melihat review jawaban atas pertanyaan.
+
+Aplikasi ini dikembangkan sebagai syarat untuk memenuhi UTS mata kuliah Pemrograman Mobile 3 pada semester ganjil 2025/2026.
+
+## d. Credit ke sumber-sumber asset yang digunakan
+
+- Font Kustom : Google Fonts (https://fonts.google.com
+)
+- Ikon : menggunakan plugin pada figma (iconify)
+- Framework: Flutter (Dart SDK)
+
+## e. Screenshot/Video Aplikasi
+
+## f. Link mockup/prototype aplikasi
+https://www.figma.com/proto/AMXCrBODFQRcaMKGRogkM4/Kuis?node-id=0-1&t=UFReldWqZFRMFUiO-1 
